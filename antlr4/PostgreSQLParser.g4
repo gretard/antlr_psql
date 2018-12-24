@@ -127,17 +127,25 @@ alter_stmt
     | alter_user_mapping_stmt
     | alter_view_stmt
     ;
-    
+
+// TODO: define argmode and use aggregate_signature
 alter_aggregate_stmt
-    : todo_implement
+    : ALTER AGGREGATE name=identifier OPEN_PAREN aggregate CLOSE_PAREN RENAME TO new_name=identifier
+    | ALTER AGGREGATE name=identifier OPEN_PAREN aggregate CLOSE_PAREN OWNER TO OPEN_BRACKET (new_owner=identifier | CURRENT_USER | SESSION_USER) CLOSE_BRACKET
+    | ALTER AGGREGATE name=identifier OPEN_PAREN aggregate CLOSE_PAREN SET SCHEMA new_schema=identifier
     ;
 
 alter_collation_stmt
-    : todo_implement
+    : ALTER COLLATION name=identifier REFRESH VERSION
+    | ALTER COLLATION name=identifier RENAME TO new_name=identifier
+    | ALTER COLLATION name=identifier OWNER TO (new_owner=identifier | CURRENT_USER | SESSION_USER)
+    | ALTER COLLATION name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_conversion_stmt
-    : todo_implement
+    : ALTER CONVERSION name=identifier RENAME TO new_name=identifier
+    | ALTER CONVERSION name=identifier OWNER TO (new_owner=identifier | CURRENT_USER | SESSION_USER)
+    | ALTER CONVERSION name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_database_stmt
@@ -149,15 +157,27 @@ alter_default_privileges_stmt
     ;
 
 alter_domain_stmt
-    : todo_implement
+    : ALTER DOMAIN name=identifier (SET DEFAULT expr | DROP DEFAULT)
+    | ALTER DOMAIN name=identifier (SET|DROP) NOT NULL
+    | ALTER DOMAIN name=identifier ADD domain_constraint (NOT VALID)?
+    | ALTER DOMAIN name=identifier DROP CONSTRAINT (IF EXISTS)? constraint_name=identifier (RESTRICT|CASCADE)
+    | ALTER DOMAIN name=identifier RENAME CONSTRAINT constraint_name=identifier TO new_constraint_name=identifier
+    | ALTER DOMAIN name=identifier VALIDATE CONSTRAINT constraint_name=identifier
+    | ALTER DOMAIN name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
+    | ALTER DOMAIN name=identifier RENAME TO new_name=identifier
+    | ALTER DOMAIN name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_event_trigger_stmt
-    : todo_implement
+    : ALTER EVENT TRIGGER name=identifier DISABLE
+    | ALTER EVENT TRIGGER name=identifier ENABLE (REPLICA|ALWAYS)?
+    | ALTER EVENT TRIGGER name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
+    | ALTER EVENT TRIGGER name=identifier RENAME TO new_name=identifier
     ;
 
 alter_extension_stmt
-    : todo_implement
+    : ALTER EXTENSION name=identifier UPDATE (TO new_version=identifier)?
+    | ALTER EXTENSION name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_foreign_data_wrapper_stmt
@@ -173,19 +193,28 @@ alter_function_stmt
     ;
 
 alter_group_stmt
-    : todo_implement
+    : ALTER GROUP (role_name=identifier|CURRENT_USER|SESSION_USER) ADD USER users=identifier_list
+    | ALTER GROUP (role_name=identifier|CURRENT_USER|SESSION_USER) DROP USER users=identifier_list
+    | ALTER GROUP group_name=identifier RENAME TO new_name=identifier
     ;
 
 alter_index_stmt
-    : todo_implement
+    : ALTER INDEX (IF EXISTS)? name=identifier RENAME TO new_name=identifier
+    | ALTER INDEX (IF EXISTS)? name=identifier SET TABLESPACE tablespace_name=identifier
+    | ALTER INDEX name=identifier DEPENDS ON EXTENSION extension_name=identifier
+//    | ALTER INDEX (IF EXISTS)? name=identifier SET (
+//    | ALTER INDEX (IF EXISTS)?
+    | ALTER INDEX ALL IN TABLESPACE name=identifier (OWNED BY roles=identifier_list)?
+      SET TABLESPACE new_tablespace=identifier NOWAIT?
     ;
 
 alter_language_stmt
-    : todo_implement
+    : ALTER PROCEDURAL? LANGUAGE name=identifier RENAME TO new_name=identifier
+    | ALTER PROCEDURAL? LANGUAGE name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
     ;
 
 alter_large_object_stmt
-    : todo_implement
+    : ALTER LARGE OBJECT large_object_oid=INTEGER_LITERAL OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
     ;
 
 alter_materialize_view_stmt
@@ -197,7 +226,9 @@ alter_operator_stmt
     ;
 
 alter_operator_class_stmt
-    : todo_implement
+    : ALTER OPERATOR CLASS name=identifier USING index_method RENAME TO new_name=identifier
+    | ALTER OPERATOR CLASS name=identifier USING index_method OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
+    | ALTER OPERATOR CLASS name=identifier USING index_method SET SCHEMA new_schema=identifier
     ;
 
 alter_operator_family_stmt
@@ -205,7 +236,9 @@ alter_operator_family_stmt
     ;
 
 alter_policy_stmt
-    : todo_implement
+    : ALTER POLICY name=identifier ON table_name=identifier RENAME TO new_name=identifier
+    | ALTER POLICY name=identifier ON table_name=identifier
+        (TO (role_name=identifier|PUBLIC|CURRENT_USER|SESSION_USER))?
     ;
 
 alter_publication_stmt
@@ -217,11 +250,12 @@ alter_role_stmt
     ;
 
 alter_rule_stmt
-    : todo_implement
+    : ALTER RULE name=identifier ON table_name=identifier RENAME TO new_name=identifier
     ;
 
 alter_schema_stmt
-    : todo_implement
+    : ALTER SCHEMA name=identifier RENAME TO new_name=identifier
+    | ALTER SCHEMA name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
     ;
 
 alter_sequence_stmt
@@ -233,7 +267,9 @@ alter_server_stmt
     ;
 
 alter_statistics_stmt
-    : todo_implement
+    : ALTER STATISTICS name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
+    | ALTER STATISTICS name=identifier RENAME TO new_name=identifier
+    | ALTER STATISTICS name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_subscription_stmt
@@ -249,7 +285,10 @@ alter_table_stmt
     ;
 
 alter_tablespace_stmt
-    : todo_implement
+    : ALTER TABLESPACE name=identifier RENAME TO new_name=identifier
+    | ALTER TABLESPACE name=identifier OWNER TO (new_owner=identifier|CURRENT_USER|SESSION_USER)
+    | ALTER TABLESPACE name=identifier SET OPEN_PAREN options_list CLOSE_PAREN
+    | ALTER TABLESPACE name=identifier RESET OPEN_PAREN identifier_list CLOSE_PAREN
     ;
 
 alter_text_search_config_stmt
@@ -265,11 +304,13 @@ alter_text_search_parser_stmt
     ;
 
 alter_text_search_template_stmt
-    : todo_implement
+    : ALTER TEXT SEARCH TEMPLATE name=identifier RENAME TO new_name=identifier
+    | ALTER TEXT SEARCH TEMPLATE name=identifier SET SCHEMA new_schema=identifier
     ;
 
 alter_trigger_stmt
-    : todo_implement
+    : ALTER TRIGGER name=identifier ON table_name=identifier RENAME TO new_name=identifier
+    | ALTER TRIGGER name=identifier ON table_name=identifier DEPENDS ON EXTENSION extension_name=identifier
     ;
 
 alter_type_stmt
@@ -359,10 +400,10 @@ create_stmt
     ;
 
 create_access_method_stmt
-    : CREATE ACCESS METHOD name TYPE INDEX HANDLER name;
+    : CREATE ACCESS METHOD name_ TYPE INDEX HANDLER name_;
 
 create_aggregate_stmt
-    : (CREATE AGGREGATE name OPEN_PAREN (IN | VARIADIC)? name? type_list CLOSE_PAREN
+    : (CREATE AGGREGATE name_ OPEN_PAREN (IN | VARIADIC)? name_? type_list CLOSE_PAREN
         OPEN_PAREN
           SFUNC EQUAL identifier COMMA
           STYPE EQUAL identifier
@@ -383,8 +424,8 @@ create_aggregate_stmt
           (COMMA SORTOP EQUAL identifier)?
           (COMMA PARALLEL EQUAL (SAFE | RESTRICTED | UNSAFE))?
         CLOSE_PAREN)
-    | (CREATE AGGREGATE name OPEN_PAREN ((IN | VARIADIC)? name? type_list)?
-         ORDER BY (IN | VARIADIC)? name? type_list CLOSE_PAREN
+    | (CREATE AGGREGATE name_ OPEN_PAREN ((IN | VARIADIC)? name_? type_list)?
+         ORDER BY (IN | VARIADIC)? name_? type_list CLOSE_PAREN
          OPEN_PAREN
            SFUNC EQUAL identifier COMMA
            STYPE EQUAL identifier
@@ -395,7 +436,7 @@ create_aggregate_stmt
            (COMMA PARALLEL EQUAL (SAFE | RESTRICTED | UNSAFE))?
            (COMMA HYPOTHETICAL)?
          CLOSE_PAREN)
-    | (CREATE AGGREGATE name
+    | (CREATE AGGREGATE name_
          OPEN_PAREN
            BASETYPE EQUAL type COMMA
            SFUNC EQUAL identifier COMMA
@@ -440,38 +481,38 @@ create_collation_opt_list
     ;
 
 create_collation_stmt
-    : (CREATE COLLATION (IF NOT EXISTS)? name OPEN_PAREN
+    : (CREATE COLLATION (IF NOT EXISTS)? name_ OPEN_PAREN
         create_collation_opt_list CLOSE_PAREN)
-    | (CREATE COLLATION (IF NOT EXISTS)? name FROM name)
+    | (CREATE COLLATION (IF NOT EXISTS)? name_ FROM name_)
     ;
 
 create_conversion_stmt
     : CREATE DEFAULT? CONVERSION identifier
-        FOR SINGLEQ_STRING_LITERAL TO SINGLEQ_STRING_LITERAL FROM name
+        FOR SINGLEQ_STRING_LITERAL TO SINGLEQ_STRING_LITERAL FROM name_
     ;
 
 create_database_stmt
-    : CREATE DATABASE name
+    : CREATE DATABASE name_
     | ( WITH?
-        (OWNER EQUAL name)?
-        (TEMPLATE EQUAL name)?
-        (ENCODING EQUAL name)?
-        (LC_COLLATE EQUAL name)?
-        (LC_CTYPE EQUAL name)?
-        (TABLESPACE EQUAL name)?
-        (ALLOW_CONNECTIONS EQUAL name)?
+        (OWNER EQUAL name_)?
+        (TEMPLATE EQUAL name_)?
+        (ENCODING EQUAL name_)?
+        (LC_COLLATE EQUAL name_)?
+        (LC_CTYPE EQUAL name_)?
+        (TABLESPACE EQUAL name_)?
+        (ALLOW_CONNECTIONS EQUAL name_)?
         (CONNECTION LIMIT EQUAL INTEGER_LITERAL)?
         (IS_TEMPLATE EQUAL INTEGER_LITERAL)?
       )?
     ;
 
 domain_constraint
-    : (CONSTRAINT name)? ( NOT NULL | NULL | CHECK OPEN_PAREN expr CLOSE_PAREN )
+    : (CONSTRAINT name_)? ( NOT NULL | NULL | CHECK OPEN_PAREN expr CLOSE_PAREN )
     ;
 
 create_domain_stmt
-    : CREATE DOMAIN name AS? type
-      ((COLLATE name) |
+    : CREATE DOMAIN name_ AS? type
+      ((COLLATE name_) |
        (DEFAULT expr) |
        domain_constraint)*
     ;
@@ -489,7 +530,7 @@ create_event_trigger_stmt
 
 // TODO: rename to options_list
 create_foreign_data_options
-    : opt=name SINGLEQ_STRING_LITERAL
+    : opt=name_ SINGLEQ_STRING_LITERAL
       (COMMA create_foreign_data_options)*
     ;
 
@@ -507,12 +548,12 @@ create_foreign_table_stmt
         (COLLATE create_collation_opt)?
       CLOSE_PAREN
       (INHERITS name_list)?
-      SERVER server_name=name
+      SERVER server_name=name_
       (OPTIONS OPEN_PAREN opts=create_foreign_data_options CLOSE_PAREN)?
     ;
 
 create_function_stmt
-    : CREATE (OR REPLACE)? FUNCTION fn_name=name
+    : CREATE (OR REPLACE)? FUNCTION fn_name=name_
     ;
 
 create_group_stmt
@@ -554,12 +595,12 @@ create_operator_stmt
     : CREATE OPERATOR opName=identifier
       OPEN_PAREN
         PROCEDURE EQUAL function_name=identifier
-        (COMMA LEFTARG EQUAL left_type=name)?
-        (COMMA RIGHTARG EQUAL right_type=name)?
-        (COMMA COMMUTATOR EQUAL com_op=name)?
-        (COMMA NEGATOR EQUAL neg_op=name)?
-        (COMMA RESTRICT EQUAL res_proc=name)?
-        (COMMA JOIN EQUAL join_proc=name)?
+        (COMMA LEFTARG EQUAL left_type=name_)?
+        (COMMA RIGHTARG EQUAL right_type=name_)?
+        (COMMA COMMUTATOR EQUAL com_op=name_)?
+        (COMMA NEGATOR EQUAL neg_op=name_)?
+        (COMMA RESTRICT EQUAL res_proc=name_)?
+        (COMMA JOIN EQUAL join_proc=name_)?
         (COMMA HASHES)?
         (COMMA MERGES)?
       CLOSE_PAREN
@@ -572,17 +613,17 @@ create_operator_class_opt
     ;
 
 create_operator_class_stmt
-    : CREATE OPERATOR CLASS name_=identifier DEFAULT? FOR TYPE data_type=identifier
+    : CREATE OPERATOR CLASS name=identifier DEFAULT? FOR TYPE data_type=identifier
         USING index_method (FAMILY family_name=identifier)? AS
         create_operator_class_opt (COMMA create_operator_class_opt)*
     ;
 
 create_operator_family_stmt
-    : CREATE OPERATOR FAMILY name_=identifier USING index_method
+    : CREATE OPERATOR FAMILY name=identifier USING index_method
     ;
 
 create_policy_stmt
-    : CREATE POLICY name_=identifier ON tableName=identifier
+    : CREATE POLICY name=identifier ON tableName=identifier
       (FOR (ALL | SELECT | INSERT | UPDATE | DELETE))?
       (TO (role_name=identifier | PUBLIC | CURRENT_USER | SESSION_USER))? // TODO: make a list here
       (USING OPEN_PAREN predicate CLOSE_PAREN)?
@@ -590,7 +631,7 @@ create_policy_stmt
     ;
 
 create_role_stmt
-    : CREATE ROLE (name | CURRENT_USER | SESSION_USER)
+    : CREATE ROLE (name_ | CURRENT_USER | SESSION_USER)
       (WITH?
         (SUPERUSER | NOSUPERUSER | CREATEDB | NOCREATEDB |
          CREATEROLE | NOCREATEROLE | INHERIT | NOINHERIT | LOGIN | NOLOGIN |
@@ -606,7 +647,7 @@ create_rule_event
 
 // TODO: resolve 'command' to its proper definition
 create_rule_stmt
-    : CREATE (OR REPLACE)? RULE name_=name AS ON event=create_rule_event
+    : CREATE (OR REPLACE)? RULE name=name_ AS ON event=create_rule_event
       TO tableName=identifier (WHERE predicate)?
       DO (ALSO | INSTEAD)? (NOTHING | command=identifier)
     ;
@@ -623,11 +664,11 @@ create_schema_stmt
     ;
 
 create_sequence_stmt
-    : CREATE (TEMPORARY | TEMP)? SEQUENCE (IF NOT EXISTS)? name_=identifier (INCREMENT BY? increment=INTEGER_LITERAL)?
+    : CREATE (TEMPORARY | TEMP)? SEQUENCE (IF NOT EXISTS)? name=identifier (INCREMENT BY? increment=INTEGER_LITERAL)?
       (MINVALUE minvalue=INTEGER_LITERAL | NO MINVALUE)?
       (MAXVALUE maxvalue=INTEGER_LITERAL | NO MAXVALUE)?
       (START WITH? start=INTEGER_LITERAL)? (CACHE cache=INTEGER_LITERAL)? (NO? CYCLE)?
-      (OWNED BY ((table_name_=identifier DOT column_name_=identifier) | NONE))?
+      (OWNED BY ((table_name=identifier DOT column_name_=identifier) | NONE))?
     ;
 
 create_server_stmt
@@ -1080,7 +1121,7 @@ values_stmt
 
 selector_clause
     :(ALL | (DISTINCT (ON expr_list)?))?
-     (STAR | (expr (AS? name)? (COMMA (STAR | expr (AS? name)?))* ))?
+     (STAR | (expr (AS? name_)? (COMMA (STAR | expr (AS? name_)?))* ))?
     ;
 
 from_clause
@@ -1169,7 +1210,7 @@ fetch_clause
     ;
 
 for_clause
-    : FOR ( UPDATE | NO KEY UPDATE | SHARE | KEY SHARE ) (OF table_name (COMMA table_name)*)? ( NOWAIT | SKIP_ LOCKED)*
+    : FOR ( UPDATE | NO KEY UPDATE | SHARE | KEY SHARE ) (OF table_name_ (COMMA table_name_)*)? ( NOWAIT | SKIP_ LOCKED)*
     ;
 
 // TODO: split into more granular expression types?
@@ -1300,15 +1341,19 @@ aggregate
       (FILTER OPEN_PAREN WHERE where_clause CLOSE_PAREN)?
     ;
 
-// TODO: rename so aliases can use 'name'? probably not
-name
+// TODO: rename aliases of [a-z]+_name to just name for clarity
+name_
     : SINGLEQ_STRING_LITERAL
     | DOUBLEQ_STRING_LITERAL
     | identifier
     ;
 
+options_list
+    : opt=identifier EQUALS value=expr (COMMA opt=identifier EQUALS value=expr)*
+    ;
+
 name_list
-    : name (COMMA name)*
+    : name_ (COMMA name_)*
     ;
 
 identifier_list
@@ -1316,7 +1361,7 @@ identifier_list
     ;
 
 // TODO: remove
-table_name
+table_name_
     : identifier
     ;
 
@@ -1354,7 +1399,7 @@ array_cons_expr
     ;
 
 from_item
-    : ONLY? table_name STAR? with_column_alias?
+    : ONLY? table_name_ STAR? with_column_alias?
       (TABLESAMPLE todo_fill_in OPEN_PAREN expr (COMMA expr)* CLOSE_PAREN (REPEATABLE OPEN_PAREN todo_fill_in CLOSE_PAREN)?)?
     | LATERAL? OPEN_PAREN stmt CLOSE_PAREN AS? alias (OPEN_PAREN column_alias (COMMA column_alias)* CLOSE_PAREN)?
 //    | OPEN_PAREN values_stmt CLOSE_PAREN AS? alias

@@ -65,12 +65,12 @@ public abstract class CommandTest {
 
     private void printSummary(String commandName, int fileCount, int falseNegative, int falsePositive) {
         int failureCount = falseNegative + falsePositive;
-        String summary = String.format("result: %s\taccuracy: %d / %d (%f)\tfalse pos rate: %d / %d (%f)\tfalse neg rate: %d / %d (%f)\n",
+        String summary = String.format("result: %s\taccuracy: %d / %d (%.3f %%)\tfalse pos rate: %d / %d (%.3f %%)\tfalse neg rate: %d / %d (%.3f %%)\n",
                 commandName,
                 fileCount-failureCount, fileCount, (double) (fileCount - failureCount) / fileCount * 100,
                 falsePositive, failureCount, (double) falsePositive / failureCount * 100,
                 falseNegative, failureCount, (double) falseNegative / failureCount * 100);
-        System.out.printf(summary);
+        System.out.print(summary);
     }
 
 }
